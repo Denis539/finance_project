@@ -1,5 +1,13 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from .models import FinancialGoal, Transaction
 
 def index(request):
-    return HttpResponse("<h1>MVP</h1><p>Система интеллектуального планирования накоплений запущена!</p><p>Проверка изменений</p>")
+    # Считаем количество записей в базе для статистики
+    goals_count = FinancialGoal.objects.count()
+    trans_count = Transaction.objects.count()
+    
+    context = {
+        'goals_count': goals_count,
+        'trans_count': trans_count,
+    }
+    return render(request, 'wallets/index.html', context)
