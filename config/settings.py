@@ -131,8 +131,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 CSRF_TRUSTED_ORIGINS = [
     "https://web-production-37cd8.up.railway.app",
 ]
-
-
-
-import os
-os.environ['DJANGO_SUPERUSER_PASSWORD'] = 'your_password_here'
