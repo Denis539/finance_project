@@ -8,7 +8,6 @@ class TransactionForm(forms.ModelForm):
         model = Transaction
         fields = ['category', 'amount']
         widgets = {
-            # Добавляем классы Tailwind прямо в код Django
             'category': forms.Select(attrs={'class': 'w-full border-2 border-black p-2', 'placeholder': 'Например: Стипендия'}),
             'amount': forms.NumberInput(attrs={'class': 'w-full border-2 border-black p-2', 'placeholder': '0.00'}),
         }
