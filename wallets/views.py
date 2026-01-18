@@ -6,6 +6,9 @@ from .models import FinancialGoal, Transaction, Category
 from .forms import TransactionForm, CategoryForm, FinancialGoalForm
 from .utils import generate_pie_chart
 from datetime import date, timedelta
+from django.contrib.auth import login  # Добавь этот импорт в начало файла
+
+
 
 @login_required
 def index(request):
@@ -118,8 +121,9 @@ def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')
+            user = form.save()
+            login(request, user) 
+            return redirect('index')  
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
