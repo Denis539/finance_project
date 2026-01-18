@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Вход</title>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="max-w-md w-full bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <h2 class="text-2xl font-black uppercase mb-6 italic">Вход в SmartSave</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="space-y-4">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" class="w-full mt-6 bg-blue-500 text-white border-4 border-black py-3 font-black uppercase hover:bg-blue-600 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none">
+                Войти
+            </button>
+            <p class="mt-4 text-sm text-center">
+                Нет аккаунта? <a href="{% url 'register' %}" class="text-blue-600 underline">Зарегистрироваться</a>
+            </p>
+        </form>
+    </div>
+</body>
+</html>

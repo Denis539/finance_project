@@ -18,7 +18,7 @@ class FinancialGoal(models.Model):
     title = models.CharField(max_length=200, verbose_name="На что копим?")
     target_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Нужная сумма")
     current_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Уже накоплено")
-    deadline = models.DateField(verbose_name="Желаемая дата")
+    deadline = models.DateField(verbose_name="Желаемая дата", null=True, blank=True)
 
     def __str__(self):
         return f"{self.title} ({self.current_amount}/{self.target_amount})"
@@ -29,13 +29,13 @@ class FinancialGoal(models.Model):
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, verbose_name="Категория")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name="Категория")
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма")
-    date = models.DateTimeField(auto_now_add=True, verbose_name="Дата")
-    comment = models.CharField(max_length=255, blank=True, verbose_name="Комментарий")
+    date = models.DateField(auto_now_add=True) 
+    description = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.date.strftime('%d.%m %H:%M')} — {self.amount} руб."
+        return f"{self.amount} - {self.category.name}"
 
     class Meta:
         verbose_name = "Транзакция"

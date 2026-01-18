@@ -131,3 +131,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 CSRF_TRUSTED_ORIGINS = [
     "https://web-production-37cd8.up.railway.app",
 ]
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
