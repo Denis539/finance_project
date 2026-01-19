@@ -11,7 +11,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name = "Категория"
-        verbose_name = "Категории"
+        verbose_name_plural = "Категории"
 
 class FinancialGoal(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -25,7 +25,7 @@ class FinancialGoal(models.Model):
 
     class Meta:
         verbose_name = "Финансовая цель"
-        verbose_name = "Финансовые цели"
+        verbose_name_plural = "Финансовые цели"
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -39,4 +39,4 @@ class Transaction(models.Model):
 
     class Meta:
         verbose_name = "Транзакция"
-        verbose_name = "Транзакции"
+        verbose_name_plural = "Транзакции"

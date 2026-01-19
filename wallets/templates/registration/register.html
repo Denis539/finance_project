@@ -11,27 +11,17 @@
             padding: 8px;
             margin-bottom: 5px;
         }
-        input:focus {
-            outline: none;
-            background-color: #fff9c4; /* Светло-желтый при фокусе */
-        }
-        ul.errorlist {
-            color: red;
-            font-size: 12px;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="max-w-md w-full bg-white  p-8 ">
-        <h2 class="text-2xl font-black uppercase mb-6 italic">Создать аккаунт</h2>
-        
+    <div class="max-w-md w-full bg-white p-8">
+        <h2 class="text-2xl font-black mb-6">Создать аккаунт</h2>
         <form method="post" class="space-y-4">
         {% csrf_token %}
         
         {% for field in form %}
             <div class="flex flex-col">
-                <label class="font-bold text-sm uppercase mb-1 text-gray-700">{{ field.label }}</label>
+                <label class="font-bold text-sm mb-1 text-gray-700">{{ field.label }}</label>
                 {{ field }}
                 {% if field.help_text %}
                     <p class="text-[10px] text-gray-400 mt-1 leading-tight">{{ field.help_text }}</p>
@@ -41,13 +31,12 @@
                 {% endfor %}
             </div>
         {% endfor %}
-
-        <button type="submit" class="w-full mt-6 bg-yellow-400  py-3 font-black uppercase hover:bg-yellow-500 transition-all active:shadow-none">
+        <button type="submit" class="w-full mt-6 bg-yellow-400 py-3 font-black uppercase hover:bg-yellow-500">
             Зарегистрироваться
         </button>
     </form>
         <p class="mt-4 text-sm text-center">
-            Уже есть аккаунт? <a href="{% url 'login' %}" class="text-blue-600 underline">Войти</a>
+            Уже есть аккаунт? <a href="{% url 'login' %}" class="text-blue-600">Войти</a>
         </p>
     </div>
 </body>

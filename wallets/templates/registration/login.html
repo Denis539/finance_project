@@ -11,31 +11,21 @@
             padding: 8px;
             margin-bottom: 5px;
         }
-        input:focus {
-            outline: none;
-            background-color: #fff9c4; /* Светло-желтый при фокусе */
-        }
-        ul.errorlist {
-            color: red;
-            font-size: 12px;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="max-w-md w-full bg-white  p-8 ">
-        <h2 class="text-2xl font-black uppercase mb-6 italic">Вход в SmartSave</h2>
-        
+    <div class="max-w-md w-full bg-white p-8">
+        <h2 class="text-2xl font-black mb-6">Вход в SmartPlanner</h2>
         <form method="post">
             {% csrf_token %}
             <div class="space-y-4">
                 {{ form.as_p }}
             </div>
-            <button type="submit" class="w-full mt-6 bg-yellow-400 text-white  py-3 font-black uppercase hover:bg-blue-600 transition-all active:shadow-none">
+            <button type="submit" class="w-full mt-6 bg-yellow-400 py-3 font-black uppercase hover:bg-yellow-500">
                 Войти
             </button>
             <p class="mt-4 text-sm text-center">
-                Нет аккаунта? <a href="{% url 'register' %}" class="text-blue-600 underline">Зарегистрироваться</a>
+                Нет аккаунта? <a href="{% url 'register' %}" class="text-blue-600">Зарегистрироваться</a>
             </p>
         </form>
     </div>

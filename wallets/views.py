@@ -10,11 +10,7 @@ from datetime import date, timedelta
 
 @login_required
 def index(request):
-    transaction_form = TransactionForm()
-    category_form = CategoryForm()
-    goal_form = FinancialGoalForm()
-    goal_error = None
-
+    # Обработка форм
     if request.method == 'POST':
         if 'add_transaction' in request.POST:
             form = TransactionForm(request.POST)
@@ -22,89 +18,66 @@ def index(request):
                 obj = form.save(commit=False)
                 obj.user = request.user
                 obj.save()
-                return redirect('index')
-        
         elif 'add_category' in request.POST:
             form = CategoryForm(request.POST)
             if form.is_valid():
                 form.save()
-                return redirect('index')
-
         elif 'add_goal' in request.POST:
-            if FinancialGoal.objects.filter(user=request.user).count() >= 3:
-                goal_error = "Лимит: 3 цели. Сосредоточьтесь на главном!"
-                goal_form = FinancialGoalForm(request.POST)
-            else:
-                form = FinancialGoalForm(request.POST)
-                if form.is_valid():
-                    obj = form.save(commit=False)
-                    obj.user = request.user
-                    obj.save()
-                    return redirect('index')
+            form = FinancialGoalForm(request.POST)
+            if form.is_valid() and FinancialGoal.objects.filter(user=request.user).count() < 3:
+                obj = form.save(commit=False)
+                obj.user = request.user
+                obj.save()
+        return redirect('index')
 
+    # Расчеты
     user_transactions = Transaction.objects.filter(user=request.user)
-    
     incomes = user_transactions.filter(category__is_income=True).aggregate(Sum('amount'))['amount__sum'] or 0
     expenses = user_transactions.filter(category__is_income=False).aggregate(Sum('amount'))['amount__sum'] or 0
-    total_saved = incomes - expenses
+    total_saved = float(incomes - expenses)
     
-    first_transaction = user_transactions.order_by('date').first()
-    daily_pace = 0
-    if first_transaction:
-        raw_date = first_transaction.date if first_transaction.date else date.today()
+    # Темп накопления
+    first_t = user_transactions.order_by('date').first()
+    daily_pace = 0.0
+    if first_t and first_t.date:
         try:
-            f_date = raw_date.date()
+            f_date = first_t.date.date() 
         except AttributeError:
-            f_date = raw_date
-            
+            f_date = first_t.date      
         days_active = (date.today() - f_date).days
-        days_active = max(days_active, 1) 
-        daily_pace = float(total_saved) / days_active
+        if total_saved > 0:
+            daily_pace = float(total_saved) / max(days_active, 1)
 
+    # Цели и прогнозы
     goals = FinancialGoal.objects.filter(user=request.user)
-    goals_count = goals.count()
-
-    for goal in goals:
-        target = float(goal.target_amount)
-        current_total = float(total_saved)
-        current_pace = float(daily_pace)
-
-        share_of_balance = current_total / goals_count if goals_count > 0 else 0
-        share_of_pace = current_pace / goals_count if goals_count > 0 else 0
-
-        allocated = min(max(share_of_balance, 0), target)
-        goal.current_allocated = round(allocated, 2)
-        
-        goal.real_percent = int((allocated / target) * 100) if target > 0 else 0
-        amount_needed = target - allocated
-
-        if amount_needed <= 0:
-            goal.forecast = "Цель достигнута! 🎉"
-        elif share_of_pace > 0:
-            days_left = amount_needed / share_of_pace
-            forecast_date = date.today() + timedelta(days=int(days_left))
-            goal.forecast = f"При делении бюджета на {goals_count} ч., накопите к {forecast_date.strftime('%d.%m.%Y')}"
+    g_count = goals.count()
+    for g in goals:
+        target = float(g.target_amount)
+        allocated = min(max(total_saved / g_count, 0), target) if g_count > 0 else 0
+        g.current_allocated = round(allocated, 2)
+        g.real_percent = int((allocated / target) * 100) if target > 0 else 0
+        needed = target - allocated
+        pace_share = (daily_pace / g_count) if g_count > 0 else 0
+        if needed <= 0:
+            g.forecast = "Достигнуто!"
+        elif pace_share > 0:
+            days_left = int(needed / pace_share)
+            g.forecast = f"Будет накоплено через {days_left} дн."
         else:
-            goal.forecast = "Нужен стабильный доход для прогноза."
+            g.forecast = "Нужны доходы для прогноза"
 
-    chart = generate_pie_chart(incomes, expenses)
-
-    context = {
-        'form': transaction_form,
-        'category_form': category_form,
-        'goal_form': goal_form,
-        'goal_error': goal_error,
+    return render(request, 'wallets/index.html', {
+        'form': TransactionForm(),
+        'category_form': CategoryForm(),
+        'goal_form': FinancialGoalForm(),
         'goals': goals,
         'total_saved': round(total_saved, 2),
-        'latest_transactions': user_transactions.order_by('-id')[:5],
-        'chart': chart,
-        'incomes': incomes,
-        'expenses': expenses,
         'daily_pace': round(daily_pace, 2),
-    }
-    
-    return render(request, 'wallets/index.html', context)
+        'latest_transactions': user_transactions.order_by('-id')[:5],
+        'chart': generate_pie_chart(float(incomes), float(expenses)),
+    })
 
+# Функция регистрации нового пользователя
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -112,6 +85,12 @@ def register(request):
             user = form.save()
             login(request, user)
             return redirect('index')
-    else:
-        form = UserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'registration/register.html', {'form': UserCreationForm()})
+
+# Функция безопасного удаления цели
+@login_required
+def delete_goal(request, goal_id):
+    goal = FinancialGoal.objects.filter(user=request.user, id=goal_id).first()
+    if goal:
+        goal.delete()
+    return redirect('index')

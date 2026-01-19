@@ -1,174 +1,149 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Finance Planner</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #f0f0f0; }
-        .brutal-shadow { shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]; }
-        .brutal-border { border-4 border-black; }
-    </style>
-</head>
-<body class="p-4 md:p-8">
-
-    <div class="max-w-6xl mx-auto mb-10">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <h1 class="text-4xl font-[900] uppercase bg-white p-4">
+    <head>
+        <meta charset="UTF-8">
+        <title>Smart Planner</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="p-8 bg-[#f0f0f0] w-[1100px] mx-auto mb-10">
+        <header class="flex justify-between items-center mb-8 gap-4">
+            <h1 class="text-4xl font-[900] bg-white p-4">
                 Smart Planner
             </h1>
             <div class="flex gap-4">
-                <div class="bg-white p-4 brutal-border font-bold">
+                <div class="bg-white p-4 font-bold">
                     <p class="text-[10px] uppercase">Общий баланс:</p>
                     <p class="text-xl">{{ total_saved }} ₽</p>
                 </div>
-                <div class="bg-white p-4 brutal-border font-bold">
+                <div class="bg-white p-4 font-bold">
                     <p class="text-[10px] uppercase">Темп накопления:</p>
                     <p class="text-xl">{{ daily_pace }} ₽/сут.</p>
                 </div>
             </div>
-        </div>
-
-        <h2 class="text-2xl font-black uppercase mb-4">Мои финансовые цели</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {% for goal in goals %}
-            <div class="bg-white brutal-border p-5 brutal-shadow flex flex-col justify-between relative overflow-hidden">
-                {% if goal.real_percent >= 100 %}
-                    <div class="absolute -right-6 -top-2 bg-green-500 text-white px-8 py-1 rotate-45 font-black text-[10px]">READY</div>
-                {% endif %}
-                
-                <div>
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-lg font-black uppercase leading-tight">{{ goal.title }}</h3>
-                    </div>
-                    
-                    <div class="w-full bg-gray-200 h-8 brutal-border mb-2 relative">
-                        <div class="bg-green-400 h-full transition-all duration-700" style="width: {{ goal.real_percent }}%"></div>
-                        <span class="absolute inset-0 flex items-center justify-center text-xs font-black">{{ goal.real_percent }}%</span>
-                    </div>
-                    
-                    <div class="flex justify-between text-[10px] font-bold uppercase mb-4">
-                        <span>Накоплено: {{ goal.current_allocated }} ₽</span>
-                        <span>Цель: {{ goal.target_amount }} ₽</span>
-                    </div>
-                </div>
-
-                <div class="mt-4 p-3 bg-blue-50 border-2 border-dashed border-blue-400">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-[9px] font-black text-blue-600 uppercase">Аналитика</span>
-                    </div>
-                    <p class="text-[11px] text-blue-900 leading-tight  font-medium">
-                        "{{ goal.forecast }}"
-                    </p>
-                </div>
-            </div>
-            {% empty %}
-            <div class="col-span-3 bg-white p-10 brutal-border brutal-shadow text-center">
-                <p class="text-gray-400 font-bold uppercase">Активных целей нет. Пора что-то запланировать!</p>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="flex gap-10">
-            
-            <div class="space-y-8 w-[800px]">
-                <h2 class="text-2xl font-black uppercase  border-b-4 border-black pb-2">Управление данными</h2>
-
-                <div class="bg-orange-300 p-6 brutal-border brutal-shadow">
-                    <h3 class="text-xl font-black uppercase mb-4  flex items-center gap-2">
-                        Добавить операцию
-                    </h3>
-                    <form method="post" class="space-y-4">
-                        {% csrf_token %}
-                        <div class="bg-white p-2 brutal-border">
-                            {{ form.as_p }}
+        </header>
+        <main>
+            <h1 class="text-2xl font-black mb-4">Мои финансовые цели</h1>         
+            <div class="grid grid-cols-3 gap-6 mb-12">
+                {% for goal in goals %}
+                <div class="bg-white p-5 flex flex-col justify-between relative overflow-hidden">                    
+                    <div>
+                        <div class="flex justify-between items-start mb-2 w-full">
+                            <h3 class="text-lg font-bold mb-4">{{ goal.title }}</h3>
+                            
+                            <a href="{% url 'delete_goal' goal.id %}" 
+                            class="ml-2 p-1 text-black"
+                            title="Удалить цель">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </a>
                         </div>
-                        <button type="submit" name="add_transaction" class="w-full bg-black text-white p-3 font-black uppercase hover:bg-gray-800 transition-all active:translate-x-1 active:translate-y-1">
-                            Записать в книгу
-                        </button>
-                    </form>
-                </div>
-
-                <div class="bg-green-300 p-6">
-                    <h3 class="text-xl font-black uppercase mb-4  flex items-center gap-2">
-                        Новая категория
-                    </h3>
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="bg-white p-2 brutal-border mb-4 ">
-                            {{ category_form.as_p }}
+                        <div class="w-full bg-gray-200 h-8 mb-2 relative">
+                            <div class="bg-green-400 h-full transition-all duration-700" style="width: {{ goal.real_percent }}%"></div>
+                            <span class="absolute inset-0 flex items-center justify-center text-xs font-black">{{ goal.real_percent }}%</span>
                         </div>
-                        <button type="submit" name="add_category" class="w-full bg-black text-white p-2 font-black uppercase text-sm">
-                            Создать категорию
-                        </button>
-                    </form>
-                </div>
-
-                <div class="bg-blue-300 p-6">
-                    <h3 class="text-xl font-black uppercase mb-2  flex items-center gap-2">
-                        Поставить цель
-                    </h3>
-                    {% if goal_error %}
-                        <p class="bg-red-500 text-white text-[10px] p-2 mb-2 font-bold uppercase brutal-border  animate-pulse">
-                            {{ goal_error }}
+                        <div class="flex justify-between text-[10px] font-bold uppercase mb-4">
+                            <span>Накоплено: {{ goal.current_allocated }} ₽</span>
+                            <span>Цель: {{ goal.target_amount }} ₽</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-blue-50 border-2 border-dashed border-blue-400">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[9px] font-black text-blue-600 uppercase">Аналитика</span>
+                        </div>
+                        <p class="text-[11px] text-blue-900 leading-tight font-medium">
+                            "{{ goal.forecast }}"
                         </p>
-                    {% endif %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="bg-white p-2 brutal-border mb-4 ">
-                            {{ goal_form.as_p }}
-                        </div>
-                        <button type="submit" name="add_goal" class="w-full bg-black text-white p-3 font-black uppercase">
-                            Добавить в план накоплений
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="space-y-8">
-                <h2 class="text-2xl font-black uppercase  border-b-4 border-black pb-2">Аналитический отчет</h2>
-
-                <div class="bg-white p-6 brutal-border brutal-shadow min-h-[400px] flex flex-col justify-center">
-                    <h3 class="text-xl font-black uppercase mb-6  text-center">Структура бюджета</h3>
-                    {% if chart %}
-                        <div class="flex justify-center">
-                            <img src="data:image/png;base64,{{ chart }}" alt="График расходов" class="w-full h-auto max-w-sm">
-                        </div>
-                    {% else %}
-                        <div class="text-center py-20 border-2 border-dashed border-gray-200">
-                            <p class="text-gray-400  font-bold">НЕТ ДАННЫХ ДЛЯ ГРАФИКА</p>
-                            <p class="text-[10px] text-gray-400 uppercase">Добавьте доходы и расходы</p>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <div class="bg-white p-6 brutal-border brutal-shadow">
-                    <div class="flex justify-between items-center mb-6 border-b-2 border-black pb-2">
-                        <h3 class="text-lg font-black uppercase ">Последние записи</h3>
                     </div>
-                    <ul class="space-y-3">
-                        {% for t in latest_transactions %}
-                        <li class="flex justify-between items-center p-2 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                            <div class="flex flex-col">
-                                <span class="text-xs font-black uppercase">{{ t.category.name }}</span>
-                                <span class="text-[9px] text-gray-400 font-bold uppercase">{{ t.date|date:"d.m.Y" }}</span>
+                </div>
+                {% empty %}
+                <div class="col-span-3 bg-white p-10 text-center">
+                    <p class="text-gray-400 font-bold">Активных целей нет. Пора что-то запланировать!</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="flex gap-10">
+                <div class="space-y-8 w-[600px] shrink-0">
+                    <h2 class="text-2xl font-black border-b-4 border-black pb-2">Управление данными</h2>
+                    <div class="bg-orange-300 p-6">
+                        <h3 class="text-xl font-black mb-4">Добавить операцию</h3>
+                        <form method="post" class="space-y-4">
+                            {% csrf_token %}
+                            <div class="bg-white p-2">
+                                {{ form.as_p }}
                             </div>
-                            <span class="font-black text-sm {% if t.category.is_income %}text-green-600{% else %}text-red-600{% endif %}">
-                                {% if t.category.is_income %}+{% else %}-{% endif %}{{ t.amount }} ₽
-                            </span>
-                        </li>
-                        {% empty %}
-                        <li class="text-center text-gray-400  py-4">Список пуст</li>
-                        {% endfor %}
-                    </ul>
+                            <button type="submit" name="add_transaction" class="w-full bg-black text-white p-3 font-black hover:bg-gray-800 transition-all">
+                                Записать в книгу
+                            </button>
+                        </form>
+                    </div>
+                    <div class="bg-green-300 p-6">
+                        <h3 class="text-xl font-black mb-4">Новая категория</h3>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="bg-white p-2 mb-4">
+                                {{ category_form.as_p }}
+                            </div>
+                            <button type="submit" name="add_category" class="w-full bg-black text-white p-2 font-black text-sm">
+                                Создать категорию
+                            </button>
+                        </form>
+                    </div>
+                    <div class="bg-blue-300 p-6">
+                        <h3 class="text-xl font-black mb-2">Поставить цель</h3>
+                        {% if goal_error %}
+                            <p class="bg-red-500 text-white text-[10px] p-2 mb-2 font-bold animate-pulse">
+                                {{ goal_error }}
+                            </p>
+                        {% endif %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="bg-white p-2 mb-4">
+                                {{ goal_form.as_p }}
+                            </div>
+                            <button type="submit" name="add_goal" class="w-full bg-black text-white p-3 font-black ">
+                                Добавить в план накоплений
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="space-y-8 flex-grow">
+                    <h2 class="text-2xl font-black border-b-4 border-black pb-2">Аналитический отчет</h2>
+                    <div class="bg-white p-6 min-h-[400px] flex flex-col justify-center">
+                        <h3 class="text-xl font-black mb-6 text-center">Структура бюджета</h3>
+                        {% if chart %}
+                            <div class="flex justify-center">
+                                <img src="data:image/png;base64,{{ chart }}" alt="График расходов" class="w-full h-auto max-w-sm">
+                            </div>
+                        {% else %}
+                            <div class="text-center py-20 border-2 border-dashed border-gray-200">
+                                <p class="text-gray-400 font-bold">НЕТ ДАННЫХ ДЛЯ ГРАФИКА</p>
+                                <p class="text-[10px] text-gray-400">Добавьте доходы и расходы</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="bg-white p-6">
+                        <div class="flex justify-between items-center mb-6 border-b-2 border-black pb-2">
+                            <h3 class="text-lg font-black">Последние записи</h3>
+                        </div>
+                        <ul class="space-y-3">
+                            {% for t in latest_transactions %}
+                            <li class="flex justify-between items-center p-2 border-b border-gray-100">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-black ">{{ t.category.name }}</span>
+                                    <span class="text-[9px] text-gray-400 font-bold">{{ t.date|date:"d.m.Y" }}</span>
+                                </div>
+                                <span class="font-black text-sm {% if t.category.is_income %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {% if t.category.is_income %}+{% else %}-{% endif %}{{ t.amount }} ₽
+                                </span>
+                            </li>
+                            {% empty %}
+                            <li class="text-center text-gray-400 py-4">Список пуст</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
-
-        </div>
-        </div>
-    </div>
-
-</body>
+        </main>
+    </body>
 </html>
