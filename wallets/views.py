@@ -21,7 +21,9 @@ def index(request):
         elif 'add_category' in request.POST:
             form = CategoryForm(request.POST)
             if form.is_valid():
-                form.save()
+                obj = form.save(commit=False)
+                obj.user = request.user
+                obj.save()
         elif 'add_goal' in request.POST:
             form = FinancialGoalForm(request.POST)
             if form.is_valid() and FinancialGoal.objects.filter(user=request.user).count() < 3:

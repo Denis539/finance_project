@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Category(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Владелец")
     name = models.CharField(max_length=100, verbose_name="Название категории")
     is_income = models.BooleanField(default=False, verbose_name="Это доход?")
 
