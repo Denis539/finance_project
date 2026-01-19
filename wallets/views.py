@@ -13,7 +13,7 @@ def index(request):
     # Обработка форм
     if request.method == 'POST':
         if 'add_transaction' in request.POST:
-            form = TransactionForm(request.POST)
+            form = TransactionForm(request.POST, user=request.user)
             if form.is_valid():
                 obj = form.save(commit=False)
                 obj.user = request.user
@@ -69,7 +69,7 @@ def index(request):
             g.forecast = "Нужны доходы для прогноза"
 
     return render(request, 'wallets/index.html', {
-        'form': TransactionForm(),
+        'form': TransactionForm(user=request.user),
         'category_form': CategoryForm(),
         'goal_form': FinancialGoalForm(),
         'goals': goals,

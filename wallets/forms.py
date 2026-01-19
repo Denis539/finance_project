@@ -11,7 +11,6 @@ class TransactionForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': 'w-full border-2 border-black p-2'}),
             'amount': forms.NumberInput(attrs={'class': 'w-full border-2 border-black p-2', 'placeholder': '0.00'}),
         }
-
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super(TransactionForm, self).__init__(*args, **kwargs)
